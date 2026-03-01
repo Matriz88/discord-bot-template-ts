@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "dotenvx run -f .env -f .env -- tsx src/index.ts",
+    "docs:serve": "npx serve docs",
     "build": "tsc",
     "start": "dotenvx run -f .env.prod -- node dist/index.js",
     "bump-version": "npm version --commit-hooks false --git-tag-version false",
