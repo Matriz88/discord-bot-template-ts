@@ -119,6 +119,7 @@ const clientId = getEnv('DISCORD_CLIENTID');
 
 ## See also
 
-- [Adding commands](commands/adding-commands.md)
+- [Building a command](building-a-command.md) — step-by-step tutorial
+- [Adding commands](commands/adding-commands.md) — checklist
 - [Configuration](configuration.md)
 - Example commands: [/feedback](commands/feedback.md), [/buttons](commands/buttons.md), [/pick](commands/pick.md)

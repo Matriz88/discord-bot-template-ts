@@ -2,7 +2,7 @@
 
 TypeScript Discord bot template for slash commands and events.
 
-**Example commands:** `/ping`, `/echo`, `/embed`, `/feedback`, `/buttons`, `/pick`, `/choose`. See [Commands overview](commands/overview.md). To build your own command step by step: [Building a command](building-a-command.md). For builders and helpers: [Reference](reference.md).
+**Example commands:** `/ping`, `/echo`, `/embed`, `/feedback`, `/buttons`, `/pick`, `/choose`. See [Commands overview](commands/overview.md). To build your own command step by step: [Building a command](building-a-command.md). Quick checklist: [Adding commands](commands/adding-commands.md). For builders and helpers: [Reference](reference.md).
 
 ## Tech stack
 

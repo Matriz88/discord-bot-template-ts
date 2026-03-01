@@ -6,4 +6,4 @@ A TypeScript Discord bot template. Use it as a base to add your own slash comman
 
 **How it works:** [How it works](how-it-works.md) — startup, slash commands, and component flow in plain language.
 
-**Commands:** [Commands overview](commands/overview.md) — example slash commands; [Adding commands](commands/adding-commands.md) — how to add your own.
+**Commands:** [Commands overview](commands/overview.md) — example slash commands; [Building a command](building-a-command.md) — step-by-step tutorial; [Adding commands](commands/adding-commands.md) — checklist.

@@ -30,4 +30,5 @@ export default {
 ## See also
 
 - [Overview](overview.md)
+- [Building a command](../building-a-command.md)
 - [Adding commands](adding-commands.md)

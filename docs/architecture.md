@@ -56,7 +56,7 @@ export const COMPONENT_HANDLERS: Record<string, (i: Interaction) => Promise<void
 };
 ```
 
-To add a command (with or without components), see [Adding commands](commands/adding-commands.md). To add an event, see [Adding events](adding-events.md).
+To add a command (with or without components), see [Building a command](building-a-command.md) or [Adding commands](commands/adding-commands.md). To add an event, see [Adding events](adding-events.md).
 
 ## Event flow
 

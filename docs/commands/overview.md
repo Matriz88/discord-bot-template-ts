@@ -10,4 +10,4 @@ Example slash commands live in `src/commands/`. Each has a short doc below.
 - **[\/pick](pick.md)** — String select menu (e.g. choose a fruit); selection handler colocated.
 - **[\/choose](choose.md)** — String option with autocomplete; demonstrates `autocomplete` callback.
 
-To add your own: [Adding commands](adding-commands.md).
+To add your own: [Building a command](../building-a-command.md) (tutorial) or [Adding commands](adding-commands.md) (checklist).
