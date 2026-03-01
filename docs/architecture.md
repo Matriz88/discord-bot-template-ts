@@ -1,16 +1,25 @@
 # Architecture
 
-See also [How it works](how-it-works.md) for a short narrative walkthrough of startup and interaction flow.
+See [How it works](how-it-works.md) for a short walkthrough of startup and interaction flow.
 
 ## Entry point
 
-[`src/index.ts`](../src/index.ts) is the entry point. It:
+[`src/index.ts`](../src/index.ts):
 
-1. Reads `DISCORD_TOKEN` and `DISCORD_CLIENTID` from the environment (exits with an error if either is missing).
-2. Creates a Discord `Client` with intents: `Guilds`, `GuildMessages`.
-3. Calls `registerCommands(client)` — loads all command modules from `src/commands/*.ts` into `client.commands`.
-4. Calls `registerEvents(client, token, clientId)` — loads all event modules from `src/events/*.ts` and attaches them to the client.
+1. Reads `DISCORD_TOKEN` and `DISCORD_CLIENTID` (exits if missing).
+2. Creates a Discord `Client` with intents `Guilds`, `GuildMessages`.
+3. Calls `registerCommands(client)` — loads `src/commands/*.ts` into `client.commands`.
+4. Calls `registerEvents(client, token, clientId)` — loads `src/events/*.ts` and attaches handlers.
 5. Calls `client.login(token)`.
+
+```typescript
+const token = getEnv('DISCORD_TOKEN');
+const clientId = getEnv('DISCORD_CLIENTID');
+const client = new Client({ intents: [...] }) as CustomClient;
+await registerCommands(client);
+await registerEvents(client, token, clientId);
+await client.login(token);
+```
 
 ## Startup and command registration flow
 
@@ -25,74 +34,70 @@ flowchart LR
   ready --> deployCommands[deployCommands to Discord]
 ```
 
-After login, when the client is ready, the `ready` event runs once and calls `deployCommands()`, which registers all slash commands with Discord's API (see [`src/deploy-commands.ts`](../src/deploy-commands.ts)).
+On ready, the `ready` event runs once and calls `deployCommands()` ([`src/deploy-commands.ts`](../src/deploy-commands.ts)).
 
 ## Command flow
 
-When a user runs a slash command (one of the registered commands):
-
-1. Discord sends an `InteractionCreate` event.
-2. The handler in [`src/events/interactionCreate.ts`](../src/events/interactionCreate.ts) receives it.
-3. For chat input commands, it looks up the command by name in `client.commands` and calls `command.execute(interaction)`.
-4. If execution throws, the handler catches the error and replies to the user with an ephemeral error message.
-
-For autocomplete interactions, the same handler looks up the command and calls `command.autocomplete(interaction)` if the command defines it.
+1. Discord sends `InteractionCreate`.
+2. Handler in [`src/events/interactionCreate.ts`](../src/events/interactionCreate.ts) looks up the command by name in `client.commands`.
+3. Calls `command.execute(interaction)` or `command.autocomplete(interaction)`.
+4. On throw, replies with ephemeral error.
 
 ## Component and modal flow
 
-The same `InteractionCreate` handler routes **modal submit**, **button**, and **string select menu** interactions by `customId`. It looks up the handler in [`componentHandlers.ts`](../src/interactions/componentHandlers.ts) and runs it.
+Same `InteractionCreate` handler routes **modal submit**, **button**, and **string select** by `customId` via [`componentHandlers.ts`](../src/interactions/componentHandlers.ts). UI builders: [`src/interactions/builders.ts`](../src/interactions/builders.ts) — `buildModal`, `getModalFieldValues`, `buildButtonRow`, `buildStringSelect`. Handlers live in command files and are registered in `componentHandlers.ts`:
 
-**UI builders** live in [`src/interactions/builders.ts`](../src/interactions/builders.ts): `buildModal`, `getModalFieldValues`, `buildButtonRow`, `buildStringSelect`. Use these to build modals, button rows, and select menus in your command's `execute`. Component handlers are implemented in the command files (e.g. `handleFeedbackModal`, `handleDemoButtons`, `handlePickFruit`) and registered in `componentHandlers.ts`.
+```typescript
+export const COMPONENT_HANDLERS: Record<string, (i: Interaction) => Promise<void>> = {
+  [FEEDBACK_MODAL]: handleFeedbackModal,
+  [DEMO_BTN_PRIMARY]: handleDemoButtons,
+  [DEMO_BTN_SECONDARY]: handleDemoButtons,
+  [PICK_FRUIT]: handlePickFruit,
+};
+```
 
-**Component logic is colocated with commands**: each command that uses modals/buttons/select defines its customIds and handler in the same file and exports them; `componentHandlers.ts` imports from command files and builds the handler map.
-
-Example commands that use these flows: **embed** (EmbedBuilder only), **feedback** (modal), **buttons** (buttons), **pick** (select menu), **choose** (autocomplete).
-
-### Adding a command that uses components
-
-1. Create the command file in `src/commands/`. Define your customIds in that file. In `execute`, build the UI using the builders from `src/interactions/builders.ts` (e.g. `buildModal`, `buildButtonRow`, `buildStringSelect`). Implement and export the submit/click/select handler in the same file (e.g. use `getModalFieldValues` for modals; for buttons/select, write an async function that reads the interaction and replies).
-2. In [`componentHandlers.ts`](../src/interactions/componentHandlers.ts), import the handler and customId(s) from the new command and add the corresponding entries to `COMPONENT_HANDLERS`.
+To add a command (with or without components), see [Adding commands](commands/adding-commands.md). To add an event, see [Adding events](adding-events.md).
 
 ## Event flow
 
-- **`Events.ClientReady`** (once) — Logs "Ready! Logged in as &lt;bot tag&gt;", then calls `deployCommands()` to register/update slash commands with Discord.
-- **`Events.InteractionCreate`** — Dispatches to the matching command's `execute` or `autocomplete`; also handles modal submit, button, and string select menu by `customId`.
+- **`Events.ClientReady`** (once) — Logs ready, then `deployCommands()`.
+- **`Events.InteractionCreate`** — Dispatches to command `execute`/`autocomplete` or component handler by `customId`.
 
 ## Key types
 
-Defined in [`src/@types/discordbot.ts`](../src/@types/discordbot.ts):
+[`src/@types/discordbot.ts`](../src/@types/discordbot.ts):
 
-- **`CustomClient`** — Extends Discord's `Client` with a `commands` collection (command name → command module).
-- **`DiscordCommand`** — Object with:
-  - `data`: SlashCommandBuilder (name, description, options).
-  - `execute(interaction)`: Promise<void>.
-  - `autocomplete(interaction)`: Promise<void> (optional but typed).
-- **`DiscordEvent`** — Object with:
-  - `name`: Discord event name (e.g. `Events.ClientReady`).
-  - `once?`: boolean — if true, the handler runs only once.
-  - `execute`: (...args: [...ClientEvents[K], string, string]) => Promise<void> (event args plus token and clientId passed by the registerer).
+- **`CustomClient`** — `Client` with `commands` collection.
+- **`DiscordCommand`** — `data` (SlashCommandBuilder), `execute(interaction)`, `autocomplete(interaction)` optional.
+- **`DiscordEvent`** — `name`, `once?`, `execute` (event args + `token`, `clientId`).
 
-## Adding a command
+**DiscordCommand** example:
 
-1. Create a new file in `src/commands/` (e.g. `mycommand.ts`).
-2. Export a default object that implements `DiscordCommand`:
-   - `data`: a `SlashCommandBuilder` with name, description, and options.
-   - `execute(interaction)`: async function that handles the command.
-   - `autocomplete(interaction)` (optional): if the command has options that support autocomplete.
-3. The registerer will pick it up automatically on the next start; `deployCommands()` will register it with Discord when the bot becomes ready.
+```typescript
+export default {
+  data: new SlashCommandBuilder().setName('ping').setDescription('Reply with Pong!'),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const latency = Date.now() - interaction.createdTimestamp;
+    await interaction.reply({ content: `Pong! (${latency}ms)` });
+  },
+} as DiscordCommand;
+```
 
-## Adding an event
+**DiscordEvent** example:
 
-1. Create a new file in `src/events/` (e.g. `guildMemberAdd.ts`).
-2. Export a default object that implements `DiscordEvent`:
-   - `name`: the Discord.js event name (e.g. `Events.GuildMemberAdd`).
-   - `once`: set to `true` if the handler should run only once.
-   - `execute`: async function with the same arguments as the event (the registerer passes through the client and optionally token/clientId for the ready event).
-3. The registerer will attach it to the client on the next start.
+```typescript
+export default {
+  name: Events.ClientReady,
+  once: true,
+  async execute(client: CustomClient, token: string, clientId: string) {
+    await deployCommands(token, clientId, client);
+  },
+} as DiscordEvent;
+```
 
 ## Other files
 
-- **`src/deploy-commands.ts`** — Called on `ClientReady`. Uses the Discord REST API to push the current set of slash commands (from `client.commands`) to Discord. This is how slash commands appear in the client.
-- **`src/interactions/`** — `helpers.ts` (error reporting via `replyOrEditError`). `builders.ts` (UI builders only: `buildModal`, `getModalFieldValues`, `buildButtonRow`, `buildStringSelect`). `componentHandlers.ts` imports handlers from command files and exports the customId-to-handler map used by the event.
-- **`src/data/`** — Optional static data for your commands (e.g. list of options or responses). This folder does not exist by default; create it if you need it, then add modules and import them from command files.
-- **`src/delete.ts`** — Standalone utility script to clear registered commands (both guild-specific and global). Useful for cleaning up during development or when removing the bot.
+- **`src/deploy-commands.ts`** — Pushes `client.commands` to Discord on ready.
+- **`src/interactions/`** — `helpers.ts` (`replyOrEditError`), `builders.ts` (UI builders), `componentHandlers.ts` (customId → handler map).
+- **`src/data/`** — Optional static data; create if needed.
+- **`src/delete.ts`** — Standalone script to clear registered commands.

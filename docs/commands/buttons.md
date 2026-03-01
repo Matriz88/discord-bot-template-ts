@@ -1,21 +1,44 @@
 # /buttons
 
-Sends a message with clickable buttons: Primary, Secondary, and a Link button to the Discord.js guide.
+Sends a message with Primary, Secondary, and Link buttons. Register both button customIds in `componentHandlers.ts` (same handler for both).
 
-## What it does
+```typescript
+import { type Interaction, SlashCommandBuilder, ChatInputCommandInteraction, ButtonStyle, MessageFlags } from 'discord.js';
+import { DiscordCommand } from '../@types/discordbot.js';
+import { buildButtonRow } from '../interactions/builders.js';
 
-The bot replies with a short line of text and a row of three buttons. Clicking the Primary or Secondary button triggers a handler that replies (ephemerally) with a different message. The third button is a link: it opens a URL and does not send an interaction to the bot. Demonstrates `buildButtonRow` and button click handlers.
+export const DEMO_BTN_PRIMARY = 'demo_btn_primary';
+export const DEMO_BTN_SECONDARY = 'demo_btn_secondary';
 
-## How it works
+const DEMO_BUTTON_MESSAGES: Record<string, string> = {
+  [DEMO_BTN_PRIMARY]: 'You clicked the primary button!',
+  [DEMO_BTN_SECONDARY]: 'You clicked the secondary button!',
+};
 
-- **Data** — `SlashCommandBuilder` for `/buttons`; no options.
-- **Execute** — Builds one action row with `buildButtonRow([...])`: two buttons with customIds (`DEMO_BTN_PRIMARY`, `DEMO_BTN_SECONDARY`) and styles Primary/Secondary, and one Link button with `url: 'https://discordjs.guide/'` (no customId). Replies with `content` and `components: [row]`.
-- **Handler** — `handleDemoButtons` is registered in `componentHandlers.ts` for both `DEMO_BTN_PRIMARY` and `DEMO_BTN_SECONDARY`. It reads `interaction.customId`, looks up the message in a small map, and replies ephemerally. Link buttons do not fire interactions; they only open the URL.
+export async function handleDemoButtons(i: Interaction): Promise<void> {
+  if (!i.isRepliable()) return;
+  const customId = 'customId' in i ? i.customId : '';
+  const content = DEMO_BUTTON_MESSAGES[customId];
+  if (content) await i.reply({ content, flags: MessageFlags.Ephemeral });
+}
 
-The handler and customIds are exported from the command file; `componentHandlers.ts` imports them and adds both customIds to the same handler.
+export default {
+  data: new SlashCommandBuilder().setName('buttons').setDescription('Show a message with clickable buttons'),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const row = buildButtonRow([
+      { customId: DEMO_BTN_PRIMARY, label: 'Primary', style: ButtonStyle.Primary },
+      { customId: DEMO_BTN_SECONDARY, label: 'Secondary', style: ButtonStyle.Secondary },
+      { label: 'Discord.js Guide', style: ButtonStyle.Link, url: 'https://discordjs.guide/' },
+    ]);
+    await interaction.reply({
+      content: 'Click a button below:',
+      components: [row],
+    });
+  },
+} as DiscordCommand;
+```
 
 ## See also
 
-- [Commands overview](commands/overview.md)
-- [Adding Commands](commands/adding-commands.md) (including "Adding a command that uses components")
-- [Architecture](../architecture.md) (component flow)
+- [Overview](overview.md)
+- [Adding commands](adding-commands.md)

@@ -1,24 +1,33 @@
 # /embed
 
-Replies with a rich embed built with Discord's EmbedBuilder.
+Replies with a rich embed (EmbedBuilder: title, description, fields, thumbnail, footer, timestamp).
 
-## What it does
+```typescript
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { DiscordCommand } from '../@types/discordbot.js';
 
-Sends a single embed that shows title, description, fields (inline and full-width), thumbnail (the bot's avatar), footer, and timestamp. No user input; the content is fixed. Use it as a reference for building embeds in your own commands.
+export default {
+  data: new SlashCommandBuilder().setName('embed').setDescription('Reply with a rich embed showcasing EmbedBuilder'),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const embed = new EmbedBuilder()
+      .setColor(0x5865f2)
+      .setTitle('Rich embed example')
+      .setDescription('This message uses **EmbedBuilder** with title, description, fields, and footer.')
+      .addFields(
+        { name: 'Field 1', value: 'Content for the first field', inline: true },
+        { name: 'Field 2', value: 'Content for the second field', inline: true },
+        { name: 'Field 3', value: 'A longer field that is not inline.', inline: false },
+      )
+      .setThumbnail(interaction.client.user.displayAvatarURL())
+      .setFooter({ text: 'Example embed from discord.js' })
+      .setTimestamp();
 
-## How it works
-
-- **Data** — `SlashCommandBuilder` with name and description; no options.
-- **Execute** — Builds an `EmbedBuilder`:
-  - `setColor`, `setTitle`, `setDescription`
-  - `addFields` with three fields (two inline, one not)
-  - `setThumbnail(interaction.client.user.displayAvatarURL())`
-  - `setFooter`, `setTimestamp`
-  - Replies with `interaction.reply({ embeds: [embed] })`.
-
-No modals, buttons, or select menus; the response is embed-only.
+    await interaction.reply({ embeds: [embed] });
+  },
+} as DiscordCommand;
+```
 
 ## See also
 
-- [Commands overview](commands/overview.md)
-- [Adding Commands](commands/adding-commands.md)
+- [Overview](overview.md)
+- [Adding commands](adding-commands.md)

@@ -1,21 +1,54 @@
 # /feedback
 
-Opens a modal (form) so the user can submit feedback with a subject and message.
+Opens a modal (subject + message); on submit, replies with a thank-you (ephemeral). Register `FEEDBACK_MODAL` in `componentHandlers.ts`.
 
-## What it does
+```typescript
+import { type Interaction, SlashCommandBuilder, ChatInputCommandInteraction, TextInputStyle, MessageFlags } from 'discord.js';
+import { DiscordCommand } from '../@types/discordbot.js';
+import { buildModal, getModalFieldValues } from '../interactions/builders.js';
 
-When the user runs `/feedback`, a modal appears with two text fields: **Subject** (short) and **Message** (paragraph). On submit, the bot replies with a thank-you message that echoes the subject and message. The reply is ephemeral (only the user sees it). Demonstrates modals and the `buildModal` / `getModalFieldValues` helpers.
+export const FEEDBACK_MODAL = 'feedback_modal';
+export const FEEDBACK_SUBJECT = 'feedback_subject';
+export const FEEDBACK_MESSAGE = 'feedback_message';
 
-## How it works
+export async function handleFeedbackModal(i: Interaction): Promise<void> {
+  if (!i.isModalSubmit()) return;
+  const values = getModalFieldValues(i, [FEEDBACK_SUBJECT, FEEDBACK_MESSAGE]);
+  await i.reply({
+    content: `Thanks for your feedback!\n**Subject:** ${values[FEEDBACK_SUBJECT]}\n**Message:** ${values[FEEDBACK_MESSAGE]}`,
+    flags: MessageFlags.Ephemeral,
+  });
+}
 
-- **Data** — `SlashCommandBuilder` for the `/feedback` command; no options (the input is collected in the modal).
-- **Execute** — Builds a modal with `buildModal(FEEDBACK_MODAL, 'Send feedback', [...])` with two field configs (customId, label, style, placeholder, required, maxLength). Calls `interaction.showModal(modal)` so the user sees the form.
-- **Handler** — When the user submits, Discord sends an interaction with the modal's customId. The handler `handleFeedbackModal` is registered in `componentHandlers.ts` under `FEEDBACK_MODAL`. It uses `getModalFieldValues(i, [FEEDBACK_SUBJECT, FEEDBACK_MESSAGE])` to read the inputs and replies with the thank-you text.
+export default {
+  data: new SlashCommandBuilder().setName('feedback').setDescription('Open a form to submit feedback (modal example)'),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const modal = buildModal(FEEDBACK_MODAL, 'Send feedback', [
+      {
+        customId: FEEDBACK_SUBJECT,
+        label: 'Subject',
+        style: TextInputStyle.Short,
+        placeholder: 'Brief subject line',
+        required: true,
+        maxLength: 100,
+      },
+      {
+        customId: FEEDBACK_MESSAGE,
+        label: 'Message',
+        style: TextInputStyle.Paragraph,
+        placeholder: 'Your feedback here...',
+        required: true,
+        maxLength: 1000,
+      },
+    ]);
+    await interaction.showModal(modal);
+  },
+} as DiscordCommand;
+```
 
-CustomIds (`FEEDBACK_MODAL`, `FEEDBACK_SUBJECT`, `FEEDBACK_MESSAGE`) and the handler live in the same command file and are exported; `componentHandlers.ts` imports them and adds the modal customId to `COMPONENT_HANDLERS`.
+In `componentHandlers.ts`: `[FEEDBACK_MODAL]: handleFeedbackModal`.
 
 ## See also
 
-- [Commands overview](commands/overview.md)
-- [Adding Commands](commands/adding-commands.md) (including "Adding a command that uses components")
-- [Architecture](../architecture.md) (component and modal flow)
+- [Overview](overview.md)
+- [Adding commands](adding-commands.md)

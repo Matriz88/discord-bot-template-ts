@@ -1,19 +1,27 @@
 # /echo
 
-Echoes back a message that the user provides.
+Echoes back the user's message (truncated to 2000 chars). Required string option.
 
-## What it does
+```typescript
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { DiscordCommand } from '../@types/discordbot.js';
 
-The user supplies a string option (e.g. "Hello world"). The bot replies with that text, truncated to Discord's message limit (2000 characters). Demonstrates a required string option.
+const MAX_LENGTH = 2000;
 
-## How it works
-
-- **Data** — `SlashCommandBuilder` with `addStringOption`: name `message`, required, with a description.
-- **Execute** — Reads the value with `interaction.options.getString('message')`, slices to 2000 characters, and replies. If the result is empty, replies with "(empty)".
-
-No components or autocomplete; a simple option + reply flow.
+export default {
+  data: new SlashCommandBuilder()
+    .setName('echo')
+    .setDescription('Echo back a message')
+    .addStringOption((option) => option.setName('message').setDescription('The message to echo').setRequired(true)),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const text = interaction.options.getString('message') ?? '';
+    const safe = text.slice(0, MAX_LENGTH);
+    await interaction.reply({ content: safe || '(empty)' });
+  },
+} as DiscordCommand;
+```
 
 ## See also
 
-- [Commands overview](commands/overview.md)
-- [Adding Commands](commands/adding-commands.md)
+- [Overview](overview.md)
+- [Adding commands](adding-commands.md)

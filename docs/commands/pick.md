@@ -1,21 +1,41 @@
 # /pick
 
-Shows a string select menu (dropdown) of fruits; the user picks one and the bot replies with the choice.
+String select menu (e.g. choose a fruit); replies ephemerally with the choice. Register `PICK_FRUIT` in `componentHandlers.ts`.
 
-## What it does
+```typescript
+import { type Interaction, SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { DiscordCommand } from '../@types/discordbot.js';
+import { buildStringSelect } from '../interactions/builders.js';
 
-The bot sends a message with a single select menu listing fruits (Apple, Banana, Cherry, etc.). The user selects one (min and max selections are 1). The bot replies ephemerally with "You chose: **value**". Demonstrates `buildStringSelect` and a select-menu handler.
+export const PICK_FRUIT = 'pick_fruit';
 
-## How it works
+const PICK_OPTIONS = [
+  { label: 'Apple', value: 'apple' },
+  { label: 'Banana', value: 'banana' },
+  { label: 'Cherry', value: 'cherry' },
+  { label: 'Date', value: 'date' },
+  { label: 'Elderberry', value: 'elderberry' },
+];
 
-- **Data** — `SlashCommandBuilder` for `/pick`; no options (the choice is made in the menu).
-- **Execute** — Builds options (label/value pairs), then `buildStringSelect(PICK_FRUIT, 'Choose a fruit', PICK_OPTIONS, 1, 1)` for min/max 1. Replies with `content` and `components: [row]`.
-- **Handler** — `handlePickFruit` is registered in `componentHandlers.ts` under `PICK_FRUIT`. It checks `interaction.isStringSelectMenu()`, reads `interaction.values` (array of selected values), and replies ephemerally with the chosen value(s).
+export async function handlePickFruit(i: Interaction): Promise<void> {
+  if (!i.isStringSelectMenu()) return;
+  const content = `You chose: **${i.values.join(', ')}**`;
+  await i.reply({ content, flags: MessageFlags.Ephemeral });
+}
 
-CustomId and handler are exported from the command file; `componentHandlers.ts` maps `PICK_FRUIT` to `handlePickFruit`.
+export default {
+  data: new SlashCommandBuilder().setName('pick').setDescription('Choose an option from a select menu'),
+  async execute(interaction: ChatInputCommandInteraction) {
+    const row = buildStringSelect(PICK_FRUIT, 'Choose a fruit', PICK_OPTIONS, 1, 1);
+    await interaction.reply({
+      content: 'Select a fruit from the menu:',
+      components: [row],
+    });
+  },
+} as DiscordCommand;
+```
 
 ## See also
 
-- [Commands overview](commands/overview.md)
-- [Adding Commands](commands/adding-commands.md) (including "Adding a command that uses components")
-- [Architecture](../architecture.md) (component flow)
+- [Overview](overview.md)
+- [Adding commands](adding-commands.md)

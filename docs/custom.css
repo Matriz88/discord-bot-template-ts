@@ -1,0 +1,9 @@
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+code,
+pre,
+.token {
+  font-family: 'JetBrains Mono', monospace !important;
+}

@@ -1,6 +1,8 @@
 - [Home](/)
 - [Getting Started](getting-started.md)
 - [Configuration](configuration.md)
+- [Building a command](building-a-command.md)
+- [Reference](reference.md)
 - [Architecture](architecture.md)
 - [How it works](how-it-works.md)
 - [Best practices](best-practices.md)
