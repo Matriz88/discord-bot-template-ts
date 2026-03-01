@@ -1,0 +1,33 @@
+{
+  "name": "discord-bot-template-ts",
+  "version": "0.0.1",
+  "description": "A template to build a Discord bot with Node.js, TypeScript, and discord.js v14",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "dotenvx run -f .env -f .env -- tsx src/index.ts",
+    "build": "tsc",
+    "start": "dotenvx run -f .env.prod -- node dist/index.js",
+    "bump-version": "npm version --commit-hooks false --git-tag-version false",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src && prettier --check \"src/**/*.ts\"",
+    "lint:fix": "eslint src --fix && prettier --write \"src/**/*.ts\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.25.1"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "^1.51.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.2",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.3.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0"
+  }
+}
