@@ -16,6 +16,6 @@ CustomIds (`FEEDBACK_MODAL`, `FEEDBACK_SUBJECT`, `FEEDBACK_MESSAGE`) and the han
 
 ## See also
 
-- [Commands overview](overview.md)
-- [Adding Commands](adding-commands.md) (including "Adding a command that uses components")
+- [Commands overview](commands/overview.md)
+- [Adding Commands](commands/adding-commands.md) (including "Adding a command that uses components")
 - [Architecture](../architecture.md) (component and modal flow)

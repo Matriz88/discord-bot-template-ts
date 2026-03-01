@@ -16,6 +16,6 @@ No modals or components; the flow is slash command + autocomplete only.
 
 ## See also
 
-- [Commands overview](overview.md)
-- [Adding Commands](adding-commands.md)
+- [Commands overview](commands/overview.md)
+- [Adding Commands](commands/adding-commands.md)
 - [Architecture](../architecture.md) (command flow, autocomplete)

@@ -16,6 +16,6 @@ The handler and customIds are exported from the command file; `componentHandlers
 
 ## See also
 
-- [Commands overview](overview.md)
-- [Adding Commands](adding-commands.md) (including "Adding a command that uses components")
+- [Commands overview](commands/overview.md)
+- [Adding Commands](commands/adding-commands.md) (including "Adding a command that uses components")
 - [Architecture](../architecture.md) (component flow)

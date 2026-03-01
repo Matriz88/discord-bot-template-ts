@@ -15,5 +15,5 @@ No components, modals, or autocomplete; the interaction is handled entirely in `
 
 ## See also
 
-- [Commands overview](overview.md)
-- [Adding Commands](adding-commands.md)
+- [Commands overview](commands/overview.md)
+- [Adding Commands](commands/adding-commands.md)

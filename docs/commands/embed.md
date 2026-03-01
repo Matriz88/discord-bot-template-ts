@@ -20,5 +20,5 @@ No modals, buttons, or select menus; the response is embed-only.
 
 ## See also
 
-- [Commands overview](overview.md)
-- [Adding Commands](adding-commands.md)
+- [Commands overview](commands/overview.md)
+- [Adding Commands](commands/adding-commands.md)
