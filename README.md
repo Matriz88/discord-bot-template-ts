@@ -4,7 +4,7 @@ A template to build a Discord bot with Node.js, TypeScript, and [discord.js](htt
 
 Example commands demonstrate **embeds**, **modals (forms)**, **buttons**, **select menus**, and **autocomplete**: `/embed`, `/feedback`, `/buttons`, `/pick`, `/choose`, plus `/ping` and `/echo`.
 
-Full documentation: see the [docs/](docs/) folder. Open [docs/index.html](docs/index.html) in a browser for the Docsify site (getting started, configuration, architecture, best practices, commands). When GitHub Pages is enabled from the `docs/` folder, the site will be available at your repo's Pages URL.
+**Full documentation:** [GitHub Pages](https://matriz88.github.io/discord-bot-template-ts/) · [docs/](docs/) (open [docs/index.html](docs/index.html) locally). Getting started, configuration, architecture, best practices, commands.
 
 <br/>
 

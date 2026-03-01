@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Discord Bot Template</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css"
+    title="docsify-darklight-theme"
+    type="text/css"
+  />
 </head>
 <body>
   <div id="app"></div>
@@ -11,12 +16,20 @@
     window.$docsify = {
       name: 'Discord Bot Template',
       repo: '',
+      basePath: location.pathname.replace(/\/$/, '') + '/',
       loadSidebar: true,
       subMaxLevel: 2,
-      search: 'auto'
+      search: 'auto',
+      darklightTheme: {
+        defaultTheme: 'dark'
+      }
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"
+    type="text/javascript"
+  ></script>
 </body>
 </html>
