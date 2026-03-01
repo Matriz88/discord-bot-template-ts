@@ -22,7 +22,7 @@
       window.$docsify = {
         name: 'Discord Bot Template',
         repo: '',
-        basePath: '/',
+        basePath: location.pathname.replace(/\/$/, '') + '/',
         alias: {
           '/.*/_sidebar.md': '/_sidebar.md',
         },
